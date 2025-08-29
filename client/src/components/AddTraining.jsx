@@ -19,7 +19,7 @@ const AddTraining = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:4000/api/trainings", form, {
+      await axios.post(`${import.meta.env.VITE_API_BASE}/api/trainings`, form, {
         withCredentials: true,
       });
       setForm({

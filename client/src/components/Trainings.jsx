@@ -26,7 +26,7 @@ const Trainings = () => {
   useEffect(() => {
     const fetchTrainings = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/trainings", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/trainings`, {
           withCredentials: true,
         });
         setTrainings(res.data);

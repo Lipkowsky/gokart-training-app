@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'  // 👈 poprawione
 
-const baseURL = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
+const baseURL = import.meta.env.VITE_API_BASE;
 
 export const api = axios.create({
   baseURL,

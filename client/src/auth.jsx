@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = () => {
-    const base = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
+    const base = import.meta.env.VITE_API_BASE;
     window.location.href = `${base}/auth/google`
   }
 
