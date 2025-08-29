@@ -1,17 +1,17 @@
-FROM node:20 AS build
+FROM node:20
 
 WORKDIR /app
-COPY package*.json ./
+
+RUN apt-get update && apt-get install -y tzdata
+
+COPY package.json package-lock.json ./
 RUN npm install
 
 COPY ./src ./src
 COPY ./prisma ./prisma
 
-# Generowanie klienta Prisma
+ENV TZ=Europe/Warsaw
+
 RUN npx prisma generate
 
-# Domyślnie Node używa production dependencies, możesz ograniczyć wielkość obrazu
-ENV NODE_ENV=production
-EXPOSE 4000
-
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
