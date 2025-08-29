@@ -25,7 +25,6 @@ services:
         condition: service_healthy
     environment:
       - MYSQL_HOST=db
-      # konfiguracja dla nginx-proxy + letsencrypt
       - VIRTUAL_HOST=app.gokart-training.cloud
       - VIRTUAL_PORT=4000
       - LETSENCRYPT_HOST=app.gokart-training.cloud
@@ -40,7 +39,9 @@ services:
       context: ./client
       args:
         VITE_API_BASE: "https://app.gokart-training.cloud"
-      target: build
+    # Montujemy gotowy build z Vite
+    volumes:
+      - ./client/dist:/usr/share/nginx/html:ro
     environment:
       - VIRTUAL_HOST=app.gokart-training.cloud
       - LETSENCRYPT_HOST=app.gokart-training.cloud
