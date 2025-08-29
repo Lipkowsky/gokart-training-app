@@ -39,8 +39,8 @@ services:
 
   client:
     build: ./client
-    environment:
-      - VITE_API_BASE=https://api.gokart-training.cloud
+    args:
+      VITE_API_BASE: "https://api.gokart-training.cloud"
     expose:
       - "80"
     labels:
