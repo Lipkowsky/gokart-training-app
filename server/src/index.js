@@ -3,7 +3,11 @@ const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 // Middleware
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.use(cors({
+  origin: "https://www.app.gokart-training.cloud",
+  credentials: true
+}));
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -14,7 +18,7 @@ app.use('/api', apiRoutes);
 // Serwer HTTP + Socket.IO
 const server = http.createServer(app);
 export const io = new Server(server, {
-  cors: { origin: CLIENT_URL, credentials: true },
+  cors: { origin: "https://www.app.gokart-training.cloud", credentials: true }
 });
 
 io.on('connection', (socket) => {
