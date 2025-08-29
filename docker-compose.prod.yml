@@ -25,7 +25,9 @@ services:
         condition: service_healthy
     environment:
       - MYSQL_HOST=db
+      # konfiguracja dla nginx-proxy + letsencrypt
       - VIRTUAL_HOST=app.gokart-training.cloud
+      - VIRTUAL_PORT=4000
       - LETSENCRYPT_HOST=app.gokart-training.cloud
       - LETSENCRYPT_EMAIL=piotrek789150@gmail.com
     command: sh -c "npx prisma migrate deploy && npm start"
