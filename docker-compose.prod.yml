@@ -39,9 +39,9 @@ services:
       context: ./client
       args:
         VITE_API_BASE: "https://app.gokart-training.cloud"
-    # Montujemy gotowy build z Vite
+      target: build
     volumes:
-      - ./client/dist:/usr/share/nginx/html:ro
+      - ./vhost/app.gokart-training.cloud:/usr/share/nginx/html:ro
     environment:
       - VIRTUAL_HOST=app.gokart-training.cloud
       - LETSENCRYPT_HOST=app.gokart-training.cloud
