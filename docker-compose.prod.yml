@@ -25,7 +25,6 @@ services:
         condition: service_healthy
     environment:
       - MYSQL_HOST=db
-      # konfiguracja dla nginx-proxy + letsencrypt
       - VIRTUAL_HOST=app.gokart-training.cloud
       - LETSENCRYPT_HOST=app.gokart-training.cloud
       - LETSENCRYPT_EMAIL=piotrek789150@gmail.com
