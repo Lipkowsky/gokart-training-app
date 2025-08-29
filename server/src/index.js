@@ -1,16 +1,5 @@
-import 'dotenv/config';
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-
-import authRoutes from './routes/auth.js';
-import apiRoutes from './routes/api/index.js';
-import { startCleanupCron } from './lib/cleanSignUp.js';
-
-const app = express();
 const PORT = process.env.PORT || 4000;
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 // Middleware
@@ -19,16 +8,15 @@ app.use(cookieParser());
 app.use(express.json());
 
 // Trasy
-app.use('/auth', authRoutes);      // → /auth/...
-app.use('/api', apiRoutes);        // → /api/...
+app.use('/auth', authRoutes);
+app.use('/api', apiRoutes);
 
-// Tworzymy serwer HTTP i Socket.IO
+// Serwer HTTP + Socket.IO
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: { origin: CLIENT_URL, credentials: true },
 });
 
-// Socket.IO – obsługa połączeń
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
@@ -39,7 +27,6 @@ io.on('connection', (socket) => {
 
 startCleanupCron();
 
-// Uruchomienie serwera
-server.listen(PORT, () => {
-  console.log(`API + WebSocket running on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`API + WebSocket running on http://${HOST}:${PORT}`);
 });
