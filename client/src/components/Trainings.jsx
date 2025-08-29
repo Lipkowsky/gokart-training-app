@@ -11,7 +11,7 @@ import Pagination from "./Pagination";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const socket = io(mport.meta.env.VITE_API_BASE);
+const socket = io(import.meta.env.VITE_API_BASE);
 const ITEMS_PER_PAGE = 6;
 
 const Trainings = () => {
