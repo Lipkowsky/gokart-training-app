@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../auth";
-import SignupCard from "./SignUpCard";
+import SignupCard from "./SignupCard";
 import toast from "react-hot-toast";
 
 const Profile = () => {
