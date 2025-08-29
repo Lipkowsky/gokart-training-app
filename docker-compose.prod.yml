@@ -40,17 +40,15 @@ services:
   client:
     build: ./client
     environment:
-      - VITE_API_BASE=https://api.gokart-training.cloud
-    volumes:
-      - ./client/src:/app/src
+    - VITE_API_BASE=https://api.gokart-training.cloud
     expose:
-      - "5173"
+    - "80"
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=Host(`app.gokart-training.cloud`)"
-      - "traefik.http.routers.client.entrypoints=websecure"
-      - "traefik.http.routers.client.tls.certresolver=myresolver"
-      - "traefik.http.services.client.loadbalancer.server.port=5173"
+    - "traefik.enable=true"
+    - "traefik.http.routers.client.rule=Host(`app.gokart-training.cloud`)"
+    - "traefik.http.routers.client.entrypoints=websecure"
+    - "traefik.http.routers.client.tls.certresolver=myresolver"
+    - "traefik.http.services.client.loadbalancer.server.port=80"
 
   reverse-proxy:
     image: traefik:v2.10
@@ -62,7 +60,7 @@ services:
     - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
     - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-    - "--certificatesresolvers.myresolver.acme.email=twoj@email.com"
+    - "--certificatesresolvers.myresolver.acme.piotrek789150@gmail.com"
     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
     - "80:80"
