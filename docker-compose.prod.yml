@@ -28,7 +28,7 @@ services:
       # konfiguracja dla nginx-proxy + letsencrypt
       - VIRTUAL_HOST=app.gokart-training.cloud
       - LETSENCRYPT_HOST=app.gokart-training.cloud
-      - LETSENCRYPT_EMAIL=piotrek789150@gmail.com   # <--- podaj swój email
+      - LETSENCRYPT_EMAIL=piotrek789150@gmail.com
     command: sh -c "npx prisma migrate deploy && npm start"
     networks:
       - backend
@@ -43,12 +43,13 @@ services:
     environment:
       - VIRTUAL_HOST=app.gokart-training.cloud
       - LETSENCRYPT_HOST=app.gokart-training.cloud
-      - LETSENCRYPT_EMAIL=piotrek789150@gmail.com   # <--- ten sam email
+      - LETSENCRYPT_EMAIL=piotrek789150@gmail.com
     networks:
       - proxy
 
   nginx-proxy:
     image: jwilder/nginx-proxy
+    container_name: nginx-proxy
     ports:
       - "80:80"
       - "443:443"
@@ -64,6 +65,8 @@ services:
     image: jrcs/letsencrypt-nginx-proxy-companion
     depends_on:
       - nginx-proxy
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - certs:/etc/nginx/certs
