@@ -40,6 +40,6 @@ io.on('connection', (socket) => {
 startCleanupCron();
 
 // Uruchomienie serwera
-server.listen(PORT, () => {
-  console.log(`API + WebSocket running on http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`API + WebSocket running on http://0.0.0.0:${PORT}`);
 });
