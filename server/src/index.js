@@ -10,8 +10,18 @@ import apiRoutes from './routes/api/index.js';
 import { startCleanupCron } from './lib/cleanSignUp.js';
 
 const app = express();
+
 const PORT = process.env.PORT || 4000;
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Host, na którym nasłuchuje backend
+const HOST = NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+
+// URL frontendu do CORS
+const CLIENT_URL =
+  NODE_ENV === 'production'
+    ? process.env.CLIENT_URL || 'https://www.app.gokart-training.cloud'
+    : process.env.CLIENT_URL || 'http://localhost:5173';
 
 // Middleware
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
@@ -40,6 +50,8 @@ io.on('connection', (socket) => {
 startCleanupCron();
 
 // Uruchomienie serwera
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`API + WebSocket running on http://0.0.0.0:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(
+    `API + WebSocket running on ${NODE_ENV} mode at http://${HOST}:${PORT}`
+  );
 });
