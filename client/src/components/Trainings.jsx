@@ -11,7 +11,7 @@ import Pagination from "./Pagination";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const socket = io("http://localhost:4000");
+const socket = io(mport.meta.env.VITE_API_BASE);
 const ITEMS_PER_PAGE = 6;
 
 const Trainings = () => {
@@ -92,7 +92,7 @@ const Trainings = () => {
     setSignupLoading((prev) => new Set(prev).add(training.id));
     try {
       await axios.post(
-        `http://localhost:4000/api/trainings/${training.id}/signup`,
+        `${import.meta.env.VITE_API_BASE}/api/trainings/${training.id}/signup`,
         {},
         { withCredentials: true }
       );
@@ -111,7 +111,7 @@ const Trainings = () => {
 
   const handleDeleteTraining = async (trainingId) => {
   try {
-    await axios.delete(`http://localhost:4000/api/trainings/${trainingId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE}/api/trainings/${trainingId}`, {
       withCredentials: true,
     });
     toast.success("Trening usunięty");

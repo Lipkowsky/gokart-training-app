@@ -12,7 +12,7 @@ const Profile = () => {
     const fetchSignups = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:4000/api/trainings/signups/me",
+          `${import.meta.env.VITE_API_BASE}/api/trainings/signups/me`,
           { withCredentials: true }
         );
         setSignups(res.data);
@@ -26,7 +26,7 @@ const Profile = () => {
   const handleConfirm = async (trainingId, signupId) => {
     try {
       await axios.patch(
-        `http://localhost:4000/api/trainings/${trainingId}/signup/${signupId}`,
+        `http://:4000/api/trainings/${trainingId}/signup/${signupId}`,
         { status: "confirmed" },
         { withCredentials: true }
       );
