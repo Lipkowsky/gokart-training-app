@@ -23,8 +23,7 @@ services:
       - NODE_ENV=production
       - CLIENT_URL=https://app.gokart-training.cloud
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     command: sh -c "npx prisma migrate deploy && npm run start"
     expose:
       - "4000"
