@@ -1,9 +1,6 @@
-version: "3.9"
-
 services:
   db:
     image: mysql:8.0
-    
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: auth_demo
@@ -14,11 +11,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-    deploy:
-      resources:
-        limits:
-          cpus: "0.25"
-          memory: 256M
+    command: --innodb-buffer-pool-size=128M --max-allowed-packet=16M
 
   server:
     build:
@@ -30,6 +23,7 @@ services:
       - MYSQL_HOST=db
       - NODE_ENV=production
       - CLIENT_URL=https://app.gokart-training.cloud
+      - NODE_OPTIONS=--max-old-space-size=128
     depends_on:
       - db
     command: sh -c "npx prisma migrate deploy && npm run start"
@@ -41,11 +35,6 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls.certresolver=myresolver"
       - "traefik.http.services.server.loadbalancer.server.port=4000"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.25"
-          memory: 256M
 
   client:
     build:
@@ -61,21 +50,13 @@ services:
       - "traefik.http.routers.client.entrypoints=websecure"
       - "traefik.http.routers.client.tls.certresolver=myresolver"
       - "traefik.http.services.client.loadbalancer.server.port=80"
-      # router tylko dla www.app.gokart-training.cloud
       - "traefik.http.routers.client-www.rule=Host(`www.app.gokart-training.cloud`)"
       - "traefik.http.routers.client-www.entrypoints=websecure"
       - "traefik.http.routers.client-www.tls.certresolver=myresolver"
       - "traefik.http.routers.client-www.middlewares=redirect-to-app"
-
-      # middleware przekierowania
       - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^https://www\\.app\\.gokart-training\\.cloud/(.*)"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=https://app.gokart-training.cloud/$$1"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 128M
 
   reverse-proxy:
     image: traefik:v2.10
@@ -84,7 +65,6 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      # ⬇ staging certyfikaty Let's Encrypt
       - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
@@ -96,11 +76,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
-    deploy:
-      resources:
-        limits:
-          cpus: "0.05"
-          memory: 64M
 
 volumes:
   db_data:
