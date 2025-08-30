@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 
 import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api/index.js';
-import { startCleanupCron } from './lib/cleanSignUp.js';
+// import { startCleanupCron } from './lib/cleanSignUp.js';
 
 const app = express();
 
@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
   });
 });
 
-startCleanupCron();
+// startCleanupCron();
 
 // Uruchomienie serwera
 server.listen(PORT, () => {
