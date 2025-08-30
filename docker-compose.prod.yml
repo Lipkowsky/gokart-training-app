@@ -11,7 +11,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-    command: --innodb-buffer-pool-size=128M --max-allowed-packet=16M
+    mem_limit: 256M
+    cpus: 0.25
 
   server:
     build:
@@ -23,7 +24,6 @@ services:
       - MYSQL_HOST=db
       - NODE_ENV=production
       - CLIENT_URL=https://app.gokart-training.cloud
-      - NODE_OPTIONS=--max-old-space-size=128
     depends_on:
       - db
     command: sh -c "npx prisma migrate deploy && npm run start"
@@ -35,6 +35,8 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls.certresolver=myresolver"
       - "traefik.http.services.server.loadbalancer.server.port=4000"
+    mem_limit: 256M
+    cpus: 0.25
 
   client:
     build:
@@ -57,6 +59,8 @@ services:
       - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^https://www\\.app\\.gokart-training\\.cloud/(.*)"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=https://app.gokart-training.cloud/$$1"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
+    mem_limit: 128M
+    cpus: 0.1
 
   reverse-proxy:
     image: traefik:v2.10
@@ -76,6 +80,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
+    mem_limit: 64M
+    cpus: 0.05
 
 volumes:
   db_data:
