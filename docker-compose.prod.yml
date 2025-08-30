@@ -47,7 +47,7 @@ services:
       - "80"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=Host(`app.gokart-training.cloud`)"
+      - "traefik.http.routers.client.rule=Host(`app.gokart-training.cloud`) || Host(`www.app.gokart-training.cloud`)"
       - "traefik.http.routers.client.entrypoints=websecure"
       - "traefik.http.routers.client.tls.certresolver=myresolver"
       - "traefik.http.services.client.loadbalancer.server.port=80"
