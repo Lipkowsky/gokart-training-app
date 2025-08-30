@@ -14,6 +14,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
 
   server:
     build:
@@ -36,6 +41,11 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls.certresolver=myresolver"
       - "traefik.http.services.server.loadbalancer.server.port=4000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
 
   client:
     build:
@@ -57,10 +67,15 @@ services:
       - "traefik.http.routers.client-www.tls.certresolver=myresolver"
       - "traefik.http.routers.client-www.middlewares=redirect-to-app"
 
-    # middleware przekierowania
+      # middleware przekierowania
       - "traefik.http.middlewares.redirect-to-app.redirectregex.regex=^https://www\\.app\\.gokart-training\\.cloud/(.*)"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.replacement=https://app.gokart-training.cloud/$$1"
       - "traefik.http.middlewares.redirect-to-app.redirectregex.permanent=true"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 128M
 
   reverse-proxy:
     image: traefik:v2.10
@@ -81,6 +96,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
+    deploy:
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: 64M
 
 volumes:
   db_data:
