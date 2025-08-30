@@ -30,7 +30,7 @@ const AddTraining = () => {
         maxParticipants: 1,
         description: "",
       });
-      toast.success('Training added!');
+      toast.success('Trening dodany!');
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.error || "Failed to add training");

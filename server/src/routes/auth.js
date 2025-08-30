@@ -165,6 +165,7 @@ router.get('/google/callback', async (req, res) => {
     res.redirect(CLIENT_URL);
   } catch (e) {
     console.error(e);
+    console.log(e);
     res.status(500).send('OAuth error');
   }
 });
