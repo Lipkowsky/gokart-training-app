@@ -1,0 +1,21 @@
+FROM node:20
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y tzdata
+
+# Kopiujemy pliki zależności
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Kopiujemy kod i schemat Prisma
+COPY ./src ./src
+COPY ./prisma ./prisma
+
+ENV TZ=Europe/Warsaw
+
+# Generowanie klienta Prisma
+RUN npx prisma generate
+
+CMD ["npm", "run", "dev"]
+

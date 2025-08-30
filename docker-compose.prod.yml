@@ -15,7 +15,9 @@ services:
       retries: 10
 
   server:
-    build: ./server
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
     env_file:
       - ./server/.env
     environment:
@@ -37,6 +39,7 @@ services:
   client:
     build:
       context: ./client
+      dockerfile: Dockerfile.prod
       args:
         VITE_API_BASE: "https://api.gokart-training.cloud"
     expose:

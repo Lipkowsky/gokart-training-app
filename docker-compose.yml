@@ -16,7 +16,9 @@ services:
       retries: 10
 
   server:
-    build: ./server
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
     env_file:
       - ./server/.env
     ports:

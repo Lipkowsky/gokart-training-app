@@ -50,8 +50,8 @@ io.on('connection', (socket) => {
 startCleanupCron();
 
 // Uruchomienie serwera
-server.listen(PORT, HOST, () => {
+server.listen(PORT, () => {
   console.log(
-    `API + WebSocket running on ${NODE_ENV} mode at http://${HOST}:${PORT}`
+    `API + WebSocket running on ${NODE_ENV} mode at port ${PORT}`
   );
 });
