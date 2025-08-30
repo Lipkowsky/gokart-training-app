@@ -26,7 +26,7 @@ const Profile = () => {
   const handleConfirm = async (trainingId, signupId) => {
     try {
       await axios.patch(
-        `http://:4000/api/trainings/${trainingId}/signup/${signupId}`,
+        `${import.meta.env.VITE_API_BASE}/api/trainings/${trainingId}/signup/${signupId}`,
         { status: "confirmed" },
         { withCredentials: true }
       );
