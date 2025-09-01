@@ -68,15 +68,32 @@ const TrainingItem = ({
       </p>
 
       {/* Uczestnicy */}
-      <div className="space-y-1 flex flex-col text-xs">
-        <span className="font-medium text-green-600">Potwierdzeni:</span>{" "}
-        {confirmedSignups.length > 0
-          ? confirmedSignups.map((s) => s.user?.name || "Unknown").join(", ")
-          : "Brak"}
-        <span className="font-medium text-yellow-600">Oczekujący:</span>{" "}
-        {pendingSignups.length > 0
-          ? pendingSignups.map((s) => s.user?.email || "Unknown").join(", ")
-          : "Brak"}
+      <div className="space-y-2 flex flex-col text-xs">
+        <div>
+          <span className="font-medium text-green-600">Potwierdzeni:</span>
+          {confirmedSignups.length > 0 ? (
+            <ol className="list-decimal list-inside space-y-1">
+              {confirmedSignups.map((s, i) => (
+                <li key={i}>{s.user?.name || s.user.email}</li>
+              ))}
+            </ol>
+          ) : (
+            <p>Brak</p>
+          )}
+        </div>
+
+        <div>
+          <span className="font-medium text-yellow-600">Oczekujący:</span>
+          {pendingSignups.length > 0 ? (
+            <ol className="list-decimal list-inside space-y-1">
+              {pendingSignups.map((s, i) => (
+                <li key={i}>{s.user?.name || s.user.email}</li>
+              ))}
+            </ol>
+          ) : (
+            <p>Brak</p>
+          )}
+        </div>
       </div>
 
       {/* Przyciski */}
