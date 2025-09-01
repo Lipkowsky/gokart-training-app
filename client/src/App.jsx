@@ -15,18 +15,26 @@ function Home() {
   const { user } = useAuth();
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-2">Witaj w starterze auth</h1>
-      <p className="text-gray-700">
-        Ten projekt pokazuje logowanie przez Google, ochronę tras i
-        auto-odświeżanie sesji.
+      <h1 className="text-2xl font-bold mb-4">Witaj!</h1>
+
+      <p className="text-gray-700 mb-4 leading-relaxed">
+        Nasza aplikacja została stworzona z myślą o torach gokartowych, które
+        chcą sprawnie zarządzać swoimi treningami i wydarzeniami. Dzięki niej
+        możesz w łatwy sposób planować sesje treningowe i rejestrować
+        uczestników.
       </p>
-      {user ? (
-        <p className="mt-3">
-          Zalogowano jako <strong>{user.name || user.email}</strong>.
-        </p>
-      ) : (
-        <p className="mt-3">Nie jesteś zalogowany.</p>
-      )}
+
+      <p className="text-gray-700 mb-4 leading-relaxed">
+        Kontroluj dostęp do toru oraz monitoruj dostępne sloty czasowe. Wszystko
+        w jednym miejscu, tak aby organizacja wydarzeń była szybka i
+        przejrzysta.
+      </p>
+
+      <p className="text-gray-700 leading-relaxed">
+        Nasza aplikacja sprawia, że zarządzanie treningami staje się łatwe i
+        bezproblemowe – zarówno dla Ciebie, jak i dla osób korzystających z
+        toru.
+      </p>
     </div>
   );
 }
@@ -46,7 +54,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/trainings" element={<Trainings />} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/profile" element={<Profile/>} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
             <Route element={<AdminRoutes />}>
               <Route path="/addTraining" element={<AddTraining />} />
