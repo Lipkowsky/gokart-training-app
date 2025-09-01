@@ -1,6 +1,9 @@
 import React from "react";
 import { BsPersonCheck } from "react-icons/bs";
 import { formatDate } from "../utils/formatDate";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css"; // domyślne style
+import { isAdmin } from "../utils/isAdmin";
 
 const TrainingItem = ({
   training,
@@ -24,54 +27,67 @@ const TrainingItem = ({
     signedUp || freeSpots === 0 || signupLoading.has(training.id);
 
   return (
-<div className="bg-white border border-[#d9d9d9] rounded-xl shadow-lg hover:shadow-xl transition-shadow p-5 flex flex-col justify-between">
-
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-lg transition-shadow p-5 flex flex-col gap-4">
       {/* Górny pasek */}
-      <div className="flex justify-between items-center mb-3">
-        <h2 className="font-semibold text-lg text-gray-900">
+      <div className="flex justify-between items-start">
+        <h2
+          className="font-semibold text-lg text-gray-900 max-w-[70%]"
+          title={training.title}
+        >
           {training.title}
         </h2>
-        <div className="flex items-center gap-1 text-gray-600 text-sm">
-          <BsPersonCheck className="text-blue-500" />
-          <span>
-            {confirmedSignups.length} / {training.maxParticipants}
-          </span>
-        </div>
+        <span className="flex items-center gap-1 text-sm bg-slate-100 px-2 py-1 rounded-lg">
+          <BsPersonCheck className="text-slate-700" />
+          {confirmedSignups.length} / {training.maxParticipants}
+        </span>
       </div>
 
       {/* Daty */}
-      <div className="bg-gray-100 text-gray-700 text-sm rounded-md px-3 py-1 mb-3">
-        {formatDate(training.startTime)} – {formatDate(training.endTime)}
+      <div className="grid grid-cols-3 gap-3 text-xs">
+        <div>
+          <span className="block font-semibold">Start:</span>
+          <span>{formatDate(training.startTime)}</span>
+        </div>
+        <div>
+          <span className="block font-semibold">Koniec:</span>
+          <span>{formatDate(training.endTime)}</span>
+        </div>
+        <div>
+          <span className="block font-semibold">Zapisy od:</span>
+          <span>{formatDate(training.openAt)}</span>
+        </div>
       </div>
 
       {/* Opis */}
-      <p className="text-sm text-gray-600 mb-3 line-clamp-4 text-center">
-        {training.description}
+      <p className="text-sm text-gray-600 line-clamp-3">
+        <Tippy content={training.description}>
+          <p className="text-sm text-gray-600 line-clamp-3 cursor-help">
+            {training.description}
+          </p>
+        </Tippy>
       </p>
 
       {/* Uczestnicy */}
-      <div className="text-xs space-y-1 mb-4">
-        <p>
-          <span className="font-medium text-green-600">Potwierdzeni:</span>{" "}
-          {confirmedSignups.map((s) => s.user?.name || "Unknown").join(", ") ||
-            "Brak"}
-        </p>
-        <p>
-          <span className="font-medium text-yellow-600">Oczekujący:</span>{" "}
-          {pendingSignups.map((s) => s.user?.email || "Unknown").join(", ") ||
-            "Brak"}
-        </p>
+      <div className="space-y-1 flex flex-col text-xs">
+        <span className="font-medium text-green-600">Potwierdzeni:</span>{" "}
+        {confirmedSignups.length > 0
+          ? confirmedSignups.map((s) => s.user?.name || "Unknown").join(", ")
+          : "Brak"}
+        <span className="font-medium text-yellow-600">Oczekujący:</span>{" "}
+        {pendingSignups.length > 0
+          ? pendingSignups.map((s) => s.user?.email || "Unknown").join(", ")
+          : "Brak"}
       </div>
 
       {/* Przyciski */}
-      <div className="flex flex-col gap-2 mt-auto">
+      <div className="flex gap-2 text-xs justify-end mt-auto">
         <button
           onClick={() => onSignup(training)}
           disabled={isDisabled}
-          className={`btn-primary ${
+          className={`px-4 py-2 rounded-lg font-semibold shadow-sm transition ${
             isDisabled
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "btn-success"
+              : "bg-green-500 hover:bg-green-600 text-white"
           }`}
         >
           {mySignup
@@ -85,12 +101,14 @@ const TrainingItem = ({
             : "Zapisz się"}
         </button>
 
-        <button
-          onClick={() => onDelete(training.id)} // tutaj trafi ID do modala
-          className="btn-dangerous"
-        >
-          Usuń trening
-        </button>
+        {user && isAdmin(user) && (
+          <button
+            onClick={() => onDelete(training.id)}
+            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold shadow-sm transition"
+          >
+            Usuń
+          </button>
+        )}
       </div>
     </div>
   );

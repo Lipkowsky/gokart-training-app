@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth";
-import { ProtectedRoute } from "./routes";
+import { AdminRoutes, ProtectedRoute } from "./routes";
 import Secret from "./components/Secret";
 import Header from "./components/Header";
 import Login from "./components/Login";
@@ -9,6 +9,7 @@ import Trainings from "./components/Trainings";
 import AddTraining from "./components/AddTraining";
 import Profile from "./components/Profile";
 import { Toaster } from "react-hot-toast";
+import ManageUser from "./components/ManageUser";
 
 function Home() {
   const { user } = useAuth();
@@ -47,8 +48,11 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<Profile/>} />
             </Route>
-            <Route element={<ProtectedRoute />}>
+            <Route element={<AdminRoutes />}>
               <Route path="/addTraining" element={<AddTraining />} />
+            </Route>
+            <Route element={<AdminRoutes />}>
+              <Route path="/manageUsers" element={<ManageUser />} />
             </Route>
           </Routes>
         </main>

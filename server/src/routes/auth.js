@@ -22,7 +22,7 @@ router.get('/me', ensureAuth, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.sub }, // 👈 spójnie używamy sub
-      select: { id: true, email: true, name: true, avatarUrl: true }
+      select: { id: true, email: true, name: true, avatarUrl: true, role: true }
     });
     res.json({ user });
   } catch (e) {

@@ -1,9 +1,15 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-
-
-const ConfirmModal = ({ open, onClose, onConfirm, message, confirmText }) => {
+const ConfirmModal = ({
+  open,
+  onClose,
+  onConfirm,
+  message,
+  confirmText,
+  confirmButtonClass = "bg-blue-500 hover:bg-blue-600 text-white",
+  cancelButtonClass = "bg-gray-200 hover:bg-gray-300 text-gray-800"
+}) => {
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
@@ -25,13 +31,11 @@ const ConfirmModal = ({ open, onClose, onConfirm, message, confirmText }) => {
       {/* modal */}
       <div className="relative bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full">
         <h2 className="text-lg font-bold mb-4 text-gray-800">Potwierdzenie</h2>
-        <p className="mb-6 text-gray-700">
-          {message}
-        </p>
+        <p className="mb-6 text-gray-700">{message}</p>
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 cursor-pointer  rounded hover:bg-gray-300 text-gray-800"
+            className={`${cancelButtonClass} px-4 py-2 rounded`}
           >
             Anuluj
           </button>
@@ -40,14 +44,14 @@ const ConfirmModal = ({ open, onClose, onConfirm, message, confirmText }) => {
               onConfirm();
               onClose();
             }}
-            className="btn-dangerous"
+            className={`${confirmButtonClass} px-5 py-2 rounded`}
           >
             {confirmText}
           </button>
         </div>
       </div>
     </div>,
-    document.body 
+    document.body
   );
 };
 

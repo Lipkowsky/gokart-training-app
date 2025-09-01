@@ -33,8 +33,6 @@ router.get("/", async (req, res) => {
  * Tworzy nowy trening i emituje go do wszystkich klientów w czasie rzeczywistym
  */
 router.post("/", ensureAuth, ensureAdmin, async (req, res) => {
-  console.log(req.user);
-
   const { title, description, startTime, endTime, openAt, maxParticipants } =
     req.body;
 
@@ -185,8 +183,23 @@ router.get("/signups/me", ensureAuth, async (req, res) => {
   try {
     const signups = await prisma.trainingsSignup.findMany({
       where: { userId: req.user.sub },
-      include: { training: true },
+      include: {
+        training: {
+          include: {
+            signups: { select: { id: true } }, // tylko id uczestników
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
+
     res.json(signups);
   } catch (err) {
     console.error(err);
@@ -198,7 +211,7 @@ router.get("/signups/me", ensureAuth, async (req, res) => {
  * DELETE /api/trainings/:id
  * Usuwa trening wraz z zapisami (tylko autor może usunąć)
  */
-router.delete("/:id", ensureAuth, async (req, res) => {
+router.delete("/:id", ensureAuth, ensureAdmin, async (req, res) => {
   const { id } = req.params;
 
   try {

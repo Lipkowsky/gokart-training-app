@@ -3,7 +3,7 @@ import { prisma } from "./prisma.js";
 
 // Cron co 5 minut
 export const startCleanupCron = () => {
-  cron.schedule("*/5 * * * *", async () => {
+  cron.schedule("*/15 * * * *", async () => {
     try {
       const result = await prisma.trainingsSignup.deleteMany({
         where: {

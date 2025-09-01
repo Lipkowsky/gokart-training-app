@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { jwtDecode } from 'jwt-decode'  // 👈 poprawione
+import { jwtDecode } from 'jwt-decode'
 
-const baseURL = import.meta.env.VITE_API_BASE;
+const baseURL = import.meta.env.VITE_API_BASE
 
 export const api = axios.create({
   baseURL,
@@ -16,9 +16,9 @@ const refreshApi = axios.create({
 })
 
 let refreshPromise = null
-let accessExp = null // czas wygaśnięcia access tokena
+let accessExp = null
 
-// 📌 helper do pobrania exp z ciasteczka access_token
+// 📌 helper do pobrania exp z access_token w cookie
 function getAccessExp() {
   try {
     const match = document.cookie.match(/access_token=([^;]+)/)
@@ -30,33 +30,38 @@ function getAccessExp() {
   }
 }
 
+// 📌 helper: czy trzeba odświeżyć token?
+function needRefresh() {
+  if (!accessExp) return true
+  const now = Date.now()
+  const buffer = 5000 // 5s zapasu
+  return accessExp - buffer < now
+}
+
+// 📌 odświeżanie z singletonem
+async function refreshToken() {
+  if (!refreshPromise) {
+    refreshPromise = refreshApi.post('/auth/refresh')
+      .then(() => {
+        accessExp = getAccessExp()
+      })
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+  await refreshPromise
+  await new Promise(r => setTimeout(r, 150)) // ⏳ dajemy czas cookie
+}
+
 // 📌 Request interceptor
 api.interceptors.request.use(async (config) => {
-  if (!accessExp) {
-    accessExp = getAccessExp()
+  if (needRefresh()) {
+    await refreshToken()
   }
-
-  const now = Date.now()
-
-  // jeśli access wygasł lub nie istnieje → odśwież
-  if (!accessExp || accessExp < now) {
-    if (!refreshPromise) {
-      refreshPromise = refreshApi.post('/auth/refresh')
-        .then(() => {
-          accessExp = getAccessExp()
-        })
-        .finally(() => {
-          refreshPromise = null
-        })
-    }
-    await refreshPromise
-    await new Promise(r => setTimeout(r, 50)) // ⏳ czekamy aż cookie się zapisze
-  }
-
   return config
 })
 
-// 📌 Response interceptor (fallback, np. access unieważniony na backendzie)
+// 📌 Response interceptor (fallback na 401)
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -66,20 +71,9 @@ api.interceptors.response.use(
     }
     original._retry = true
 
-    if (!refreshPromise) {
-      refreshPromise = refreshApi.post('/auth/refresh')
-        .then(() => {
-          accessExp = getAccessExp()
-        })
-        .finally(() => {
-          refreshPromise = null
-        })
-    }
-
     try {
-      await refreshPromise
-      await new Promise(r => setTimeout(r, 50))
-      return api(original)
+      await refreshToken()
+      return api(original) // retry
     } catch (e) {
       return Promise.reject(e)
     }

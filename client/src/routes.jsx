@@ -1,13 +1,19 @@
-import React from "react"
-import { Navigate, Outlet } from "react-router-dom"
-import { useAuth } from "./auth"
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "./auth";
+import { isAdmin } from "./utils/isAdmin";
 
 export function ProtectedRoute() {
-  const { user, loading } = useAuth()
-  if (loading) return <div className="p-6">Ładowanie…</div>
-  return user ? <Outlet /> : <Navigate to="/login" replace />
+  const { user, loading } = useAuth();
+  if (loading) return <div className="p-6">Ładowanie…</div>;
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
+export function AdminRoutes() {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="p-6">Ładowanie…</div>;
+  return user && isAdmin(user) ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
 // export const ROUTES = [
 //   { path: "/", label: "Home", protected: false },

@@ -22,7 +22,7 @@ const Trainings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { user } = useAuth();
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchTrainings = async () => {
       try {
@@ -80,7 +80,7 @@ const Trainings = () => {
 
   const handleSignup = async (training) => {
     if (!user) {
-      toast.loading("Musisz być zalogowany");
+      toast.error("Musisz być zalogowany");
 
       return navigate("/login");
     }
@@ -230,7 +230,7 @@ const Trainings = () => {
         }
         message="Czy na pewno chcesz usunąć trening?"
         confirmText="Usuń"
-        confirmButtonClass="btn-primary"
+        confirmButtonClass="btn-dangerous"
         cancelButtonClass="btn-secondary"
       />
     </div>

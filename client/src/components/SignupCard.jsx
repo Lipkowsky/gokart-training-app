@@ -12,20 +12,51 @@ const SignupCard = ({ signup, onConfirm }) => {
   };
 
   return (
-    <div className="border rounded-2xl shadow-md p-4 bg-white flex justify-between items-center">
-      <div>
-        <p className="font-bold">{signup.training?.title}</p>
-        <p className="text-sm text-gray-600">
-          {formatDate(signup.training?.startTime)} –{" "}
-          {formatDate(signup.training?.endTime)}
-        </p>
+    <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-lg p-6 flex flex-col gap-4 transition hover:shadow-xl">
+      {/* Nagłówek */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="font-semibold text-lg text-gray-900">
+            {signup.training.title}
+          </h3>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-sm">
+          <div>
+            <span className="block font-semibold">Start:</span>
+            <span>{formatDate(signup.training.startTime)}</span>
+          </div>
+          <div>
+            <span className="block font-semibold">Koniec:</span>
+            <span>{formatDate(signup.training.endTime)}</span>
+          </div>
+        </div>
+        {signup.user && (
+          <div className="flex items-center gap-2">
+            <img
+              src={signup.user.avatarUrl}
+              alt={signup.user.name || signup.user.email}
+              className="w-9 h-9 rounded-full border object-cover"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              {signup.user.name || signup.user.email}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Opis */}
+
+      {/* Status + countdown */}
+      <div className="flex flex-col gap-1">
         <p className="text-sm">
           Status:{" "}
           <span
             className={
               signup.status === "confirmed"
-                ? "text-green-600"
-                : "text-yellow-600"
+                ? "text-green-600 font-medium"
+                : signup.status === "pending"
+                ? "text-yellow-600 font-medium"
+                : "text-red-600 font-medium"
             }
           >
             {STATUS_LABELS[signup.status]}
@@ -40,10 +71,20 @@ const SignupCard = ({ signup, onConfirm }) => {
         )}
       </div>
 
+      {/* Statystyki */}
+      <div className="flex justify-between text-xs text-gray-500 pt-2 border-t">
+        <span>
+          <span className="font-semibold">Zapisanych: </span>
+          {signup.training.signups.length} / {signup.training.maxParticipants}
+        </span>
+        <span>Zapisano: {formatDate(signup.signedAt)}</span>
+      </div>
+
+      {/* Akcja */}
       {signup.status === "pending" && timeLeft > 0 && (
         <button
           onClick={() => onConfirm(signup.trainingId, signup.id)}
-          className="px-3 py-1 rounded bg-green-500 text-white"
+          className="mt-2 self-end px-4 py-2 text-sm rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 active:scale-95 transition"
         >
           Potwierdź
         </button>

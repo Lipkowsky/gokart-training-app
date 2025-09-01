@@ -6,7 +6,10 @@ import { IoMenu } from "react-icons/io5";
 import logo from "../../assets/karting.png";
 import { useAuth } from "../auth";
 import { useNavigate } from "react-router-dom";
-
+import { isAdmin } from "../utils/isAdmin";
+import { FaUserAlt } from "react-icons/fa";
+import { IoAdd } from "react-icons/io5";
+import { MdManageAccounts } from "react-icons/md";
 const Header = () => {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
@@ -19,13 +22,20 @@ const Header = () => {
       onClick: () => navigate("/trainings"),
     },
     {
+      label: "Moje treningi",
+      icon: <FaUserAlt />,
+      onClick: () => navigate("/profile"),
+    },
+    user && isAdmin(user) && {
       label: "Dodaj trening",
-      icon: <IoIosAddCircle />,
+      icon: <IoAdd />,
       onClick: () => navigate("/addTraining"),
     },
-    { label: "Moje treningi", onClick: () => navigate("/myTrainings") },
-    { label: "Archiwum", onClick: () => navigate("/archived") },
-    { label: "Statystyki", onClick: () => navigate("/stats") },
+    user && isAdmin(user) && {
+      label: "Zarządzaj użytkownikami",
+      icon: <MdManageAccounts />,
+      onClick: () => navigate("/manageUsers"),
+    },
   ];
 
   return (
@@ -52,29 +62,27 @@ const Header = () => {
             <MdListAlt />
             Lista treningów
           </button>
-
-          {/* Dropdown menu dla pozostałych opcji */}
-          <div className="relative group">
-            <button className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50">
-              Menu
-            </button>
-            <div
-              className="absolute top-0 left-full ml-[0.15rem] w-48 bg-white border rounded shadow-lg
-      opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
-      transform transition-all duration-200 origin-top-left z-50"
-            >
-              {menuItems.slice(1).map((item) => (
-                <button
-                  key={item.label}
-                  onClick={item.onClick}
-                  className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 text-left text-sm"
-                >
-                  {item.icon}
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <button
+            onClick={() => navigate("/profile")}
+            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
+          >
+            <FaUserAlt />
+            Moje treningi
+          </button>
+          {user && isAdmin(user) && <button
+            onClick={() => navigate("/addTraining")}
+            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
+          >
+            <IoAdd />
+            Dodaj trening
+          </button>}
+         {user && isAdmin(user) && <button
+            onClick={() => navigate("/manageUsers")}
+            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
+          >
+            <MdManageAccounts/>
+           Zarządzaj użytkownikami
+          </button>}
         </div>
 
         {/* Prawa część: login / avatar */}
