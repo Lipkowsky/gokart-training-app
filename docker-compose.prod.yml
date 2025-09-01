@@ -4,7 +4,7 @@ services:
     env_file:
       - ./server/.env   # tu muszą być zmienne MYSQL_ROOT_PASSWORD i MYSQL_DATABASE
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - db_data:/var/lib/mysql
@@ -12,7 +12,7 @@ services:
     cpus: 0.5
     # healthcheck możesz tymczasowo usunąć, jeśli kontener wcześniej OOM-killował się
     # healthcheck:
-    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_PASSWORD}"]
     #   interval: 5s
     #   timeout: 3s
     #   retries: 10
