@@ -1,18 +1,21 @@
 services:
   db:
     image: mysql:8.0
+    env_file:
+      - ./server/.env   # tu muszą być zmienne MYSQL_ROOT_PASSWORD i MYSQL_DATABASE
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: auth_demo
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    mem_limit: 256m
-    cpus: 0.25
+    mem_limit: 768m
+    cpus: 0.5
+    # healthcheck możesz tymczasowo usunąć, jeśli kontener wcześniej OOM-killował się
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+    #   interval: 5s
+    #   timeout: 3s
+    #   retries: 10
 
   server:
     build:
@@ -35,8 +38,8 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls.certresolver=myresolver"
       - "traefik.http.services.server.loadbalancer.server.port=4000"
-    mem_limit: 256m
-    cpus: 0.25
+    mem_limit: 512m
+    cpus: 0.5
 
   client:
     build:
