@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { MdListAlt, MdLogout } from "react-icons/md";
-import { IoIosAddCircle } from "react-icons/io";
-import { IoMenu } from "react-icons/io5";
+import { MdListAlt, MdLogout, MdManageAccounts } from "react-icons/md";
+import { IoMenu, IoAdd } from "react-icons/io5";
 import logo from "../../assets/karting.png";
 import { useAuth } from "../auth";
 import { useNavigate } from "react-router-dom";
 import { isAdmin } from "../utils/isAdmin";
 import { FaUserAlt } from "react-icons/fa";
-import { IoAdd } from "react-icons/io5";
-import { MdManageAccounts } from "react-icons/md";
+
 const Header = () => {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // menuItems zrobione tak, żeby nie zawierało false/undefined
   const menuItems = [
     {
       label: "Lista treningów",
@@ -26,16 +25,20 @@ const Header = () => {
       icon: <FaUserAlt />,
       onClick: () => navigate("/profile"),
     },
-    user && isAdmin(user) && {
-      label: "Dodaj trening",
-      icon: <IoAdd />,
-      onClick: () => navigate("/addTraining"),
-    },
-    user && isAdmin(user) && {
-      label: "Zarządzaj użytkownikami",
-      icon: <MdManageAccounts />,
-      onClick: () => navigate("/manageUsers"),
-    },
+    ...(user && isAdmin(user)
+      ? [
+          {
+            label: "Dodaj trening",
+            icon: <IoAdd />,
+            onClick: () => navigate("/addTraining"),
+          },
+          {
+            label: "Zarządzaj użytkownikami",
+            icon: <MdManageAccounts />,
+            onClick: () => navigate("/manageUsers"),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -54,35 +57,16 @@ const Header = () => {
 
         {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-2">
-          {/* Lista treningów zawsze widoczna */}
-          <button
-            onClick={() => navigate("/trainings")}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
-          >
-            <MdListAlt />
-            Lista treningów
-          </button>
-          <button
-            onClick={() => navigate("/profile")}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
-          >
-            <FaUserAlt />
-            Moje treningi
-          </button>
-          {user && isAdmin(user) && <button
-            onClick={() => navigate("/addTraining")}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
-          >
-            <IoAdd />
-            Dodaj trening
-          </button>}
-         {user && isAdmin(user) && <button
-            onClick={() => navigate("/manageUsers")}
-            className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
-          >
-            <MdManageAccounts/>
-           Zarządzaj użytkownikami
-          </button>}
+          {menuItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={item.onClick}
+              className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
         </div>
 
         {/* Prawa część: login / avatar */}
@@ -92,7 +76,7 @@ const Header = () => {
               <img
                 onClick={() => navigate("/profile")}
                 src={user.avatarUrl}
-                alt=""
+                alt="avatar"
                 className="w-7 h-7 cursor-pointer rounded-full"
               />
               <span className="text-sm">{user.name || user.email}</span>
@@ -127,13 +111,12 @@ const Header = () => {
       {mobileMenuOpen && (
         <div
           className={`md:hidden bg-white border-t border-gray-200 shadow-md px-4 py-2 flex flex-col gap-2 z-50
-      transition-all duration-300 ease-in-out
-      ${
-        mobileMenuOpen
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 -translate-y-2"
-      }
-    `}
+          transition-all duration-300 ease-in-out
+          ${
+            mobileMenuOpen
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-2"
+          }`}
         >
           {menuItems.map((item) => (
             <button

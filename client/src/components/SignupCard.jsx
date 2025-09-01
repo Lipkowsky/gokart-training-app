@@ -20,16 +20,7 @@ const SignupCard = ({ signup, onConfirm }) => {
             {signup.training.title}
           </h3>
         </div>
-        <div className="grid grid-cols-3 gap-3 text-sm">
-          <div>
-            <span className="block font-semibold">Start:</span>
-            <span>{formatDate(signup.training.startTime)}</span>
-          </div>
-          <div>
-            <span className="block font-semibold">Koniec:</span>
-            <span>{formatDate(signup.training.endTime)}</span>
-          </div>
-        </div>
+       
         {signup.user && (
           <div className="flex items-center gap-2">
             <img
@@ -43,6 +34,16 @@ const SignupCard = ({ signup, onConfirm }) => {
           </div>
         )}
       </div>
+       <div className="flex flex-col gap-3 text-sm">
+          <div>
+            <span className="block font-semibold">Start:</span>
+            <span>{formatDate(signup.training.startTime)}</span>
+          </div>
+          <div>
+            <span className="block font-semibold">Koniec:</span>
+            <span>{formatDate(signup.training.endTime)}</span>
+          </div>
+        </div>
 
       {/* Opis */}
 
