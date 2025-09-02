@@ -10,6 +10,9 @@ import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { handleExportTrainingsToPDF } from "../utils/trainingsToPDF";
+import { FaFilePdf } from "react-icons/fa6";
+import { CiSaveDown2 } from "react-icons/ci";
 
 const socket = io(import.meta.env.VITE_API_BASE);
 const ITEMS_PER_PAGE = 6;
@@ -22,13 +25,18 @@ const Trainings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const [signupToDelete, setSignupToDelete] = useState(null);
+  const [selectedTrainings, setSelectedTrainings] = useState([]);
+
   useEffect(() => {
     const fetchTrainings = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/trainings`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE}/api/trainings`,
+          {
+            withCredentials: true,
+          }
+        );
         setTrainings(res.data);
       } catch (err) {
         console.error(err);
@@ -65,6 +73,16 @@ const Trainings = () => {
       );
     });
 
+    socket.on("signup-deleted", ({ trainingId, signupId }) => {
+      setTrainings((prev) =>
+        prev.map((t) =>
+          t.id === trainingId
+            ? { ...t, signups: t.signups.filter((s) => s.id !== signupId) }
+            : t
+        )
+      );
+    });
+
     // 🆕 obsługa usuwania treningu
     socket.on("training-deleted", ({ trainingId }) => {
       setTrainings((prev) => prev.filter((t) => t.id !== trainingId));
@@ -74,9 +92,47 @@ const Trainings = () => {
       socket.off("new-training");
       socket.off("signup-created");
       socket.off("signup-updated");
-      socket.off("training-deleted"); // 🧹 cleanup
+      socket.off("training-deleted");
+      socket.off("signup-deleted");
     };
   }, []);
+
+  const handleSelectTraining = (trainingId, checked) => {
+    setSelectedTrainings((prev) =>
+      checked ? [...prev, trainingId] : prev.filter((id) => id !== trainingId)
+    );
+  };
+
+  const handleDeleteSignup = async () => {
+    if (!signupToDelete) return;
+
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE}/api/trainings/${
+          signupToDelete.trainingId
+        }/signup/${signupToDelete.signupId}`,
+        { withCredentials: true }
+      );
+      toast.success("Zawodnik usunięty");
+      setTrainings((prev) =>
+        prev.map((t) =>
+          t.id === signupToDelete.trainingId
+            ? {
+                ...t,
+                signups: t.signups.filter(
+                  (s) => s.id !== signupToDelete.signupId
+                ),
+              }
+            : t
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Błąd przy usuwaniu zawodnika");
+    } finally {
+      setSignupToDelete(null); // zamknięcie modala
+    }
+  };
 
   const handleSignup = async (training) => {
     if (!user) {
@@ -110,22 +166,23 @@ const Trainings = () => {
   };
 
   const handleDeleteTraining = async (trainingId) => {
-  try {
-    await axios.delete(`${import.meta.env.VITE_API_BASE}/api/trainings/${trainingId}`, {
-      withCredentials: true,
-    });
-    toast.success("Trening usunięty");
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE}/api/trainings/${trainingId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      toast.success("Trening usunięty");
 
-    // stan odświeży się także przez socket.io ("training-deleted"),
-    // ale możesz zrobić optymistycznie:
-    setTrainings((prev) => prev.filter((t) => t.id !== trainingId));
-  } catch (err) {
-    console.error(err);
-    toast.error(err.response?.data?.error || "Błąd przy usuwaniu");
-  } finally {
-    setTrainingToDelete(null); // zamykamy modal
-  }
-};
+      setTrainings((prev) => prev.filter((t) => t.id !== trainingId));
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Błąd przy usuwaniu");
+    } finally {
+      setTrainingToDelete(null); // zamykamy modal
+    }
+  };
 
   // 🔍 Filtrowanie
   const filteredTrainings = useMemo(() => {
@@ -181,15 +238,31 @@ const Trainings = () => {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-8xl mx-auto">
       {/* 🔍 Search */}
-      <div className="mb-6">
+
+      <div className="flex mb-6 gap-2 items-stretch">
         <SearchBar
           value={search}
           onChange={setSearch}
           placeholder="Szukaj treningów..."
-          className="input"
+          className="flex-[0.95]" // 80%
         />
+        <button
+          onClick={() => {
+            const trainingsToExport = trainings.filter((t) =>
+              selectedTrainings.includes(t.id)
+            );
+            handleExportTrainingsToPDF(trainingsToExport);
+          }}
+          disabled={selectedTrainings.length <= 0}
+          className="flex-[0.05] bg-slate-600 hover:bg-slate-700 disabled:bg-gray-300 disabled:cursor-not-allowed px-2 cursor-pointer text-white font-semibold text-md rounded-md"
+        >
+          <span className="flex justify-center gap-2">
+            <FaFilePdf />
+            <CiSaveDown2 />
+          </span>
+        </button>
       </div>
 
       {/* 📋 Lista treningów */}
@@ -202,7 +275,10 @@ const Trainings = () => {
               user={user}
               signupLoading={signupLoading}
               onSignup={handleSignup}
-              onDelete={setTrainingToDelete} 
+              onDelete={setTrainingToDelete}
+              onDeleteSignup={setSignupToDelete}
+              isSelected={selectedTrainings.includes(training.id)}
+              onSelect={(checked) => handleSelectTraining(training.id, checked)}
             />
           ))}
         </div>
@@ -221,7 +297,6 @@ const Trainings = () => {
         />
       </div>
 
-  
       <ConfirmModal
         open={!!trainingToDelete}
         onClose={() => setTrainingToDelete(null)}
@@ -229,6 +304,15 @@ const Trainings = () => {
           trainingToDelete && handleDeleteTraining(trainingToDelete)
         }
         message="Czy na pewno chcesz usunąć trening?"
+        confirmText="Usuń"
+        confirmButtonClass="btn-dangerous"
+        cancelButtonClass="btn-secondary"
+      />
+      <ConfirmModal
+        open={!!signupToDelete}
+        onClose={() => setSignupToDelete(null)}
+        onConfirm={handleDeleteSignup}
+        message="Czy na pewno chcesz usunąć tego zawodnika z treningu?"
         confirmText="Usuń"
         confirmButtonClass="btn-dangerous"
         cancelButtonClass="btn-secondary"

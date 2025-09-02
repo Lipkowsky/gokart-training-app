@@ -241,4 +241,55 @@ router.delete("/:id", ensureAuth, ensureAdmin, async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/trainings/:trainingId/signup/:signupId
+ * Usuwa zapis zawodnika, tylko jeśli trening jeszcze się nie rozpoczął
+ */
+router.delete("/:trainingId/signup/:signupId", ensureAuth, async (req, res) => {
+  const { trainingId, signupId } = req.params;
+
+  try {
+    // znajdź trening
+    const training = await prisma.training.findUnique({
+      where: { id: Number(trainingId) },
+    });
+
+    if (!training) {
+      return res.status(404).json({ error: "Training not found" });
+    }
+
+    // sprawdź, czy trening już się rozpoczął
+    if (new Date(training.startTime) <= new Date()) {
+      return res.status(403).json({ error: "Nie można usuwać zawodników z zakończonych treningów" });
+    }
+
+    // znajdź zapis
+    const signup = await prisma.trainingsSignup.findUnique({
+      where: { id: Number(signupId) },
+    });
+
+    if (!signup) {
+      return res.status(404).json({ error: "Signup not found" });
+    }
+
+    // uprawnienia: zawodnik może usunąć siebie, admin może każdego
+    if (signup.userId !== req.user.sub && !req.user.isAdmin) {
+      return res.status(403).json({ error: "Brak uprawnień" });
+    }
+
+    await prisma.trainingsSignup.delete({
+      where: { id: Number(signupId) },
+    });
+
+    // 🔔 powiadom klientów
+    io.emit("signup-deleted", { trainingId: Number(trainingId), signupId: Number(signupId) });
+
+    res.json({ message: "Signup deleted", signupId: Number(signupId) });
+  } catch (err) {
+    console.error("Error deleting signup:", err);
+    res.status(500).json({ error: "Failed to delete signup" });
+  }
+});
+
+
 export default router;
