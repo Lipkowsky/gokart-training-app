@@ -62,7 +62,7 @@ const AddTraining = () => {
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
-              className="input w-full text-xs"
+              className="input w-full text-sm"
               placeholder="Wpisz tytuł treningu"
             />
           </div>
@@ -78,7 +78,7 @@ const AddTraining = () => {
               showTimeSelect
               timeIntervals={1}
               dateFormat="dd.MM.yyyy HH:mm"
-              className="input w-full text-xs"
+              className="input w-full text-sm"
               placeholderText="Wybierz datę i godzinę rozpoczęcia"
               required
               wrapperClassName="w-full"
@@ -96,7 +96,7 @@ const AddTraining = () => {
               showTimeSelect
               timeIntervals={1}
               dateFormat="dd.MM.yyyy HH:mm"
-              className="input w-full text-xs"
+              className="input w-full text-sm"
               placeholderText="Wybierz datę i godzinę zakończenia"
               required
               wrapperClassName="w-full"
@@ -114,7 +114,7 @@ const AddTraining = () => {
               showTimeSelect
               timeIntervals={1}
               dateFormat="dd.MM.yyyy HH:mm"
-              className="input w-full text-xs"
+              className="input w-full text-sm"
               placeholderText="Wybierz datę otwarcia zapisów"
               required
               wrapperClassName="w-full"
@@ -135,7 +135,7 @@ const AddTraining = () => {
               }}
               min={1}
               step={1}
-              className="input w-full text-xs"
+              className="input w-full text-sm"
               required
             />
           </div>
@@ -148,12 +148,12 @@ const AddTraining = () => {
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="input min-h-[100px] w-full text-xs"
+              className="input min-h-[100px] w-full text-sm"
               placeholder="Napisz krótki opis treningu..."
             />
-            <p className="text-xs text-gray-500">{form.description.length}/191 znaków</p>
+            <p className="text-sm text-gray-500">{form.description.length}/191 znaków</p>
             {form.description.length > 191 && (
-              <p className="text-xs text-red-600">Opis nie może przekraczać 191 znaków!</p>
+              <p className="text-sm text-red-600">Opis nie może przekraczać 191 znaków!</p>
             )}
           </div>
 
