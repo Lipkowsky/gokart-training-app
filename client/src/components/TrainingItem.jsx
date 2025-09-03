@@ -31,7 +31,7 @@ const TrainingItem = ({
   const now = new Date();
   // tutaj sprawdzamy startTime < teraz (czyli trening rozpoczął się/ jest w przeszłości)
   const isFinished = training.startTime
-    ? new Date(training.startTime) < now
+    ? new Date(training.endTime) < now
     : false;
 
   // button disabled jeśli: już zapisany / brak miejsc / trwa zapisywanie / trening zakończony
@@ -159,7 +159,7 @@ const TrainingItem = ({
             }`}
           >
             {isFinished
-              ? "Zawody zakończone"
+              ? "Trening zakończony"
               : mySignup
               ? mySignup.status === "pending"
                 ? "Oczekuje na potwierdzenie"
