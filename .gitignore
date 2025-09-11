@@ -1,0 +1,8 @@
+.DS_Store
+node_modules
+dist
+.env
+.env.dev
+.env.docker.example
+server/.env
+client/.env

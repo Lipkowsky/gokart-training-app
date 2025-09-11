@@ -1,0 +1,73 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum TrainingSignupStatus {
+  pending
+  open
+  confirmed
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  googleId  String    @unique
+  email     String
+  name      String?
+  avatarUrl String?
+  createdAt DateTime  @default(now())
+  tokens    RefreshToken[]
+  role      Role      @default(user)
+  isBlocked Boolean  @default(false)
+  trainings Training[]  // relacja do treningów, które utworzył użytkownik
+  signups  TrainingsSignup[] // relacja do zapisów użytkownika
+  signupsCreated TrainingsSignup[] @relation("SignupCreator") // <-- backrelation dla createdBy
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  token     String
+  isValid   Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Training {
+  id              Int                  @id @default(autoincrement())
+  title           String
+  description     String? @db.Text 
+  startTime       DateTime
+  endTime         DateTime?
+  openAt          DateTime?
+  maxParticipants Int
+  createdBy       User                 @relation(fields: [createdById], references: [id])
+  createdById     Int
+  signups         TrainingsSignup[]
+}
+
+model TrainingsSignup {
+  id         Int                  @id @default(autoincrement())
+  user       User?                @relation(fields: [userId], references: [id])
+  userId     Int?
+  training   Training             @relation(fields: [trainingId], references: [id])
+  trainingId Int
+  status     TrainingSignupStatus @default(pending)
+  signedAt   DateTime             @default(now())
+  expiresAt  DateTime
+
+  guestName  String?              // Imię i nazwisko gościa
+  createdBy  User?                @relation("SignupCreator", fields: [createdById], references: [id])
+  createdById Int?                // Kto dodał (właściciel konta)
+  
+  @@unique([userId, trainingId])
+}
