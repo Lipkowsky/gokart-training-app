@@ -41,7 +41,7 @@ export const handleExportTrainingsToPDF = (trainings) => {
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 5,
         head: [["Potwierdzeni uczestnicy"]],
-        body: confirmedSignups.map((s) => [s.user?.name || s.user?.email]),
+        body: confirmedSignups.map((s) => [s.user?.name || s.user?.email || s.guestName]),
         theme: "grid",
         headStyles: { fillColor: [34, 139, 34], textColor: 255 },
       });
