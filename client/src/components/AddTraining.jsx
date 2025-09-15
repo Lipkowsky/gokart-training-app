@@ -4,8 +4,11 @@ import { useAuth } from "../auth";
 import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useEffect } from "react";
+import { useTrainingCopyStore } from "../store/useTrainingCopyStore";
 
 const AddTraining = () => {
+  const { copiedTraining, clearCopiedTraining } = useTrainingCopyStore();
   const { user } = useAuth();
   const [form, setForm] = useState({
     title: "",
@@ -16,7 +19,15 @@ const AddTraining = () => {
     description: "",
   });
 
-  if (!user) return <div className="p-6 text-center">Musisz być zalogowany</div>;
+  useEffect(() => {
+    if (copiedTraining) {
+      setForm(copiedTraining);
+      clearCopiedTraining(); // czyścimy po załadowaniu, żeby nie nadpisywało za każdym wejściem
+    }
+  }, [copiedTraining, clearCopiedTraining]);
+
+  if (!user)
+    return <div className="p-6 text-center">Musisz być zalogowany</div>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +60,9 @@ const AddTraining = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">➕ Dodaj nowy trening</h1>
+        <h1 className="text-3xl font-bold mb-6 text-gray-800">
+          ➕ Dodaj nowy trening
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Tytuł */}
@@ -147,13 +160,19 @@ const AddTraining = () => {
             </label>
             <textarea
               value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
               className="input min-h-[100px] w-full text-sm"
               placeholder="Napisz krótki opis treningu..."
             />
-            <p className="text-sm text-gray-500">{form.description.length}/191 znaków</p>
+            <p className="text-sm text-gray-500">
+              {form.description.length}/191 znaków
+            </p>
             {form.description.length > 191 && (
-              <p className="text-sm text-red-600">Opis nie może przekraczać 191 znaków!</p>
+              <p className="text-sm text-red-600">
+                Opis nie może przekraczać 191 znaków!
+              </p>
             )}
           </div>
 
