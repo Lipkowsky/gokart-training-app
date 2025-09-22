@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { MdListAlt, MdLogout, MdManageAccounts } from "react-icons/md";
 import { IoMenu, IoAdd } from "react-icons/io5";
@@ -7,11 +7,56 @@ import { useAuth } from "../auth";
 import { useNavigate } from "react-router-dom";
 import { isAdmin } from "../utils/isAdmin";
 import { FaUserAlt } from "react-icons/fa";
+import axios from "axios";
+import { io } from "socket.io-client";
+
+
+const socket = io(import.meta.env.VITE_API_BASE, {
+  withCredentials: true,
+});
 
 const Header = () => {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  // funkcja pomocnicza do pobrania liczby pending signups
+  const fetchPending = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE}/api/trainings/signups/me`,
+        { withCredentials: true }
+      );
+      if (Array.isArray(res.data)) {
+        const pending = res.data.filter((s) => s.status === "pending");
+        setPendingCount(pending.length);
+      } else {
+        setPendingCount(0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch signups", err);
+      setPendingCount(0);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) {
+      setPendingCount(0);
+      return;
+    }
+    fetchPending();
+
+    socket.on("signup-created", fetchPending);
+    socket.on("signup-updated", fetchPending);
+    socket.on("signup-deleted", fetchPending);
+
+    return () => {
+      socket.off("signup-created", fetchPending);
+      socket.off("signup-updated", fetchPending);
+      socket.off("signup-deleted", fetchPending);
+    };
+  }, [user]);
 
   // menuItems zrobione tak, żeby nie zawierało false/undefined
   const menuItems = [
@@ -61,10 +106,15 @@ const Header = () => {
             <button
               key={item.label}
               onClick={item.onClick}
-              className="flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
+              className="relative flex items-center justify-center gap-2 px-3 py-1.5 font-semibold text-sm border rounded hover:bg-gray-50"
             >
               {item.icon}
-              {item.label}
+              <span>{item.label}</span>
+              {item.label === "Moje treningi" && pendingCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-green-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                  {pendingCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -125,10 +175,15 @@ const Header = () => {
                 item.onClick();
                 setMobileMenuOpen(false);
               }}
-              className="flex items-center gap-2 px-3 py-2 font-semibold border rounded hover:bg-gray-100 text-left"
+              className="relative flex items-center gap-2 px-3 py-2 font-semibold border rounded hover:bg-gray-100 text-left"
             >
               {item.icon}
-              {item.label}
+              <span>{item.label}</span>
+              {item.label === "Moje treningi" && pendingCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                  {pendingCount}
+                </span>
+              )}
             </button>
           ))}
 

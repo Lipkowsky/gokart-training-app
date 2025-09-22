@@ -193,10 +193,7 @@ router.get("/signups/me", ensureAuth, async (req, res) => {
   try {
     const signups = await prisma.trainingsSignup.findMany({
       where: {
-        OR: [
-          { userId: req.user.sub }, // Twoje własne zapisy
-          { createdById: req.user.sub }, // Goście dodani przez Ciebie
-        ],
+        OR: [{ userId: req.user.sub }, { createdById: req.user.sub }],
       },
       include: {
         training: {
@@ -212,6 +209,9 @@ router.get("/signups/me", ensureAuth, async (req, res) => {
             avatarUrl: true,
           },
         },
+      },
+      orderBy: {
+        signedAt: "desc", // 🔥 najnowsze jako pierwsze
       },
     });
 
@@ -280,11 +280,9 @@ router.delete("/:trainingId/signup/:signupId", ensureAuth, async (req, res) => {
 
     // sprawdź, czy trening już się skończył
     if (new Date(training.endTime) <= new Date()) {
-      return res
-        .status(403)
-        .json({
-          error: "Nie można usuwać zawodników z zakończonych treningów",
-        });
+      return res.status(403).json({
+        error: "Nie można usuwać zawodników z zakończonych treningów",
+      });
     }
 
     // znajdź zapis

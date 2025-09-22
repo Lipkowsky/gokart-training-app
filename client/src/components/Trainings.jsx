@@ -100,7 +100,7 @@ const Trainings = () => {
 
   const pendingSignups = useMemo(() => {
     const now = new Date();
-    const userId = user?.id; 
+    const userId = user?.id;
 
     return (
       trainings.flatMap((t) =>
@@ -259,20 +259,42 @@ const Trainings = () => {
   return (
     <div className="p-6 max-w-8xl mx-auto">
       {pendingSignups.length > 0 && (
-        <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-md">
-          Masz {pendingSignups.length} zapis
-          {pendingSignups.length > 1 ? "y" : ""} do potwierdzenia:
-          <ul className="mt-2 list-disc list-inside">
+        <div className="bg-white border border-yellow-300 rounded-2xl shadow-lg overflow-hidden mb-5">
+          <div className="flex items-center gap-3 bg-yellow-100 px-4 py-3 border-b border-yellow-200">
+            <h2 className="font-semibold text-yellow-800">
+              Masz {pendingSignups.length} zapis
+              {pendingSignups.length > 1 ? "y" : ""} do potwierdzenia
+            </h2>
+          </div>
+
+          <div className="flex flex-col divide-y divide-gray-100">
             {pendingSignups.map((s) => (
-              <li key={s.id}>
-                {s.user?.name || s.guestName} na trening "{s.trainingTitle}" –
-                potwierdź do {formatDate(s.expiresAt)}
-              </li>
+              <div
+                key={s.id}
+                className="flex flex-col sm:flex-row justify-between px-5 py-4 hover:bg-gray-50 transition"
+              >
+                <div>
+                  <p className="font-medium text-gray-800">
+                    {s.user?.name || s.guestName}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    na trening{" "}
+                    <span className="font-semibold text-gray-700">
+                      „{s.trainingTitle}”
+                    </span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-gray-500 mt-2 sm:mt-0">
+                  <span className="font-semibold">
+                    potwierdź do {formatDate(s.expiresAt)}
+                  </span>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
-      {/* 🔍 Search */}
 
       <div className="flex mb-6 gap-2 items-stretch">
         <SearchBar

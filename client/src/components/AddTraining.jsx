@@ -6,10 +6,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect } from "react";
 import { useTrainingCopyStore } from "../store/useTrainingCopyStore";
+import { useNavigate } from "react-router-dom";
 
 const AddTraining = () => {
   const { copiedTraining, clearCopiedTraining } = useTrainingCopyStore();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
     startTime: null,
@@ -51,6 +53,7 @@ const AddTraining = () => {
         description: "",
       });
       toast.success("Trening dodany!");
+      navigate('/trainings')
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.error || "Nie udało się dodać treningu");

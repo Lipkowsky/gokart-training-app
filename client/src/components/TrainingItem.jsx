@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useTrainingCopyStore } from "../store/useTrainingCopyStore";
 import { useNavigate } from "react-router-dom";
 import { FaRegCopy, FaTrash } from "react-icons/fa";
+import { useIsOpen } from "../hooks/useIsOpen";
 
 const TrainingItem = ({
   training,
@@ -22,7 +23,7 @@ const TrainingItem = ({
   onSelect,
 }) => {
   const [guestModalOpen, setGuestModalOpen] = useState(false);
-
+  const isOpen = useIsOpen(training.openAt);
   const signups = training.signups || [];
   const confirmedSignups = signups.filter((s) => s.status === "confirmed");
   const pendingSignups = signups.filter((s) => s.status === "pending");
@@ -45,7 +46,8 @@ const TrainingItem = ({
     !mySignup &&
     freeSpots > 0 &&
     !signupLoading.has(training.id) &&
-    !isFinished;
+    !isFinished &&
+    isOpen;
 
   const { setCopiedTraining } = useTrainingCopyStore();
   const navigate = useNavigate();
@@ -110,11 +112,12 @@ const TrainingItem = ({
 
   return (
     <div className="relative">
-      {/* Karta */}
       <div className="bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-lg transition-shadow p-5 flex flex-col gap-4">
-        {/* Treść wyszarzona jeśli zakończony */}
-        <div className={`${isFinished ? "grayscale opacity-90" : ""} flex flex-col gap-4`}>
-          {/* Nagłówek */}
+        <div
+          className={`${
+            isFinished ? "grayscale opacity-90" : ""
+          } flex flex-col gap-4`}
+        >
           <div className="flex justify-between items-start">
             <h2
               className="font-semibold text-lg text-gray-900 max-w-[70%] select-text"
@@ -146,7 +149,9 @@ const TrainingItem = ({
             </div>
             <div>
               <span className="block font-semibold">Koniec:</span>
-              <span className="select-text">{formatDate(training.endTime)}</span>
+              <span className="select-text">
+                {formatDate(training.endTime)}
+              </span>
             </div>
             <div>
               <span className="block font-semibold">Zapisy od:</span>
@@ -213,13 +218,12 @@ const TrainingItem = ({
               : "Zapisz się"}
           </button>
 
-          {/* Przycisk dla gości */}
           {user && (
             <button
               onClick={() => setGuestModalOpen(true)}
-              disabled={isFinished || freeSpots === 0}
+              disabled={isFinished || freeSpots === 0 || !isOpen}
               className={`px-4 py-2 rounded-lg font-semibold shadow-sm transition ${
-                isFinished || freeSpots === 0
+                isFinished || freeSpots === 0 || !isOpen
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-blue-500 hover:bg-blue-600 text-white"
               }`}
@@ -228,7 +232,6 @@ const TrainingItem = ({
             </button>
           )}
 
-          {/* Kopiuj */}
           {user && isAdmin(user) && (
             <Tippy content="Kopiuj trening">
               <button
