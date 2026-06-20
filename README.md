@@ -1,4 +1,4 @@
-# React + Express + MySQL — Google OAuth Auth Starter (PL)
+# React + Express + MySQL — Gokart Training App(PL)
 
 **Funkcje**
 - Logowanie WYŁĄCZNIE przez Google OAuth 2.0 (brak hasła)
